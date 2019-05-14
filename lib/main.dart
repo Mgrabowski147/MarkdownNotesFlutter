@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'CardItemModel.dart';
 import 'ScrollingPage.dart';
 
 void main() => runApp(new MyApp());
