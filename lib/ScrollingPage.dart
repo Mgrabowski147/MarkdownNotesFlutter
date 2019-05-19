@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'CardItemModel.dart';
+import 'editor-widget/markdownEditorWidget.dart';
+import 'editor-widget/mdDocument.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -7,21 +9,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-
   var appColors = [
     Color.fromRGBO(231, 129, 109, 1.0),
     Color.fromRGBO(99, 138, 223, 1.0),
     Color.fromRGBO(111, 194, 173, 1.0),
     Color.fromRGBO(231, 129, 109, 1.0),
   ];
+
   var cardIndex = 0;
   ScrollController scrollController;
   var currentColor = Color.fromRGBO(231, 129, 109, 1.0);
 
   var cardsList = [
-    CardItemModel("Personal", Icons.account_circle, 9, 0.83),
-    CardItemModel("Work", Icons.work, 12, 0.24),
-    CardItemModel("Home", Icons.home, 7, 0.32)
+    CardItemModel("Personal", Icons.account_circle, 9, 0.83, Color.fromRGBO(231, 129, 109, 1.0)),
+    CardItemModel("Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
+    CardItemModel("Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0))
   ];
 
   AnimationController animationController;
@@ -39,7 +41,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return new Scaffold(
       backgroundColor: currentColor,
       appBar: new AppBar(
-        title: new Text("TODO", style: TextStyle(fontSize: 16.0),),
+        title: new Text(
+          "Markdown Notes",
+          style: TextStyle(fontSize: 16.0),
+        ),
         backgroundColor: currentColor,
         centerTitle: true,
         actions: <Widget>[
@@ -57,8 +62,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           children: <Widget>[
             Row(),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 64.0, vertical: 24.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 64.0, vertical: 24.0),
               child: Container(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,19 +71,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Icon(
-                        Icons.account_circle, size: 45.0, color: Colors.white,),
+                        Icons.account_circle,
+                        size: 45.0,
+                        color: Colors.white,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 12.0),
-                      child: Text("Hello, Jane.", style: TextStyle(
-                          fontSize: 30.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400),),
+                      child: Text(
+                        "Hello, Kate.",
+                        style: TextStyle(
+                            fontSize: 30.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400),
+                      ),
                     ),
-                    Text("Looks like feel good.",
-                      style: TextStyle(color: Colors.white),),
-                    Text("You have 3 tasks to do today.",
-                      style: TextStyle(color: Colors.white,),),
+                    Text(
+                      "Looks like feel good.",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      "You have 3 tasks to do today.",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -89,17 +106,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 64.0, vertical: 8.0),
-                  child: Text("TODAY : JUL 21, 2018",
-                    style: TextStyle(color: Colors.white),),
+                  child: Text(
+                    "TODAY : JUL 21, 2018",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 Container(
-                  height: 350.0,
+                  height: 280.0,
                   child: ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: cardsList.length,
                     controller: scrollController,
                     scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, position) { return _buildCard(position); },
+                  itemBuilder: (context, position) {
+                return _buildCard(cardsList[position]);
+                // cardsList.map((card) => _buildCard(card));
+                },
                   ),
                 ),
               ],
@@ -111,8 +133,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildCard(position)
-  {
+  Widget _buildCard(CardItemModel cardItem) {
     return GestureDetector(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -121,49 +142,61 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             width: 250.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment
-                  .spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Icon(cardsList[position].icon,
-                        color: appColors[position%3],),
                       Icon(
-                        Icons.more_vert, color: Colors.grey,),
-
+                        cardItem.icon,
+                        color: cardItem.color,
+                      ),
+                      Icon(
+                        Icons.more_vert,
+                        color: Colors.grey,
+                      ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment
-                        .start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 4.0),
-                        child: Text("${cardsList[position]
-                            .tasksRemaining} Tasks",
-                          style: TextStyle(
-                              color: Colors.grey),),
+                      ...cardItem
+                          .documents
+                      // TODO: .sort((doc) => doc.editDate)
+                          .take(2)
+                          .map(
+                            (doc) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 1.0),
+                            child: _buildMarkdownDocumentRow(doc)),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
                         child: Text(
-                          "${cardsList[position].cardTitle}",
-                          style: TextStyle(fontSize: 28.0),),
+                          "${cardItem.documents.length} Markdown documents",
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: LinearProgressIndicator(
-                          value: cardsList[position]
-                              .taskCompletion,),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text("${cardItem.cardTitle}",
+                                style: TextStyle(fontSize: 28.0)),
+                            Icon(
+                              Icons.add,
+                              color: Colors.grey,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -171,13 +204,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0)
-          ),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
       ),
       onHorizontalDragEnd: _horizontalDragCard,
-      onLongPress: _deleteCard,
     );
   }
 
@@ -267,7 +298,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onPressed: () {
                 setState(() {
                   if (myController.text.length > 0)
-                    cardsList.add(CardItemModel(myController.text, Icons.account_circle, 9, 0.83));
+                    cardsList.add(CardItemModel(myController.text, Icons.account_circle, 9, 0.83, appColors[0]));
                 });
                 Navigator.pop(context);
               })
@@ -275,5 +306,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
-}
 
+
+
+  Widget _buildMarkdownDocumentRow(MdDocument document) {
+    // final bool alreadyDone = item.done;
+
+    return new ListTile(
+      title: new Text(document.name, style: TextStyle(fontSize: 20.0)
+          // style: alreadyDone ? _lineThrough : _biggerFont,
+          ),
+      trailing: new Icon(
+        // Add the lines from here...
+        Icons.edit,
+        color: Colors.orange,
+      ),
+      onTap: () async {
+        await Navigator.of(context).push(new MaterialPageRoute(
+          builder: (context) => MarkdownEditorWidget(document),
+        ));
+      },
+      contentPadding: EdgeInsets.only(bottom: 0.0),
+      dense: true,
+    );
+  }
+}
