@@ -209,7 +209,74 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       onHorizontalDragEnd: _horizontalDragCard,
+      onLongPressStart: (details) { _onLongPressCard(cardItem, details); },
     );
+  }
+
+  final  popupButtonKey = GlobalKey<State>(); // We use `State` because Flutter libs do not export `PopupMenuButton` state specifically.
+
+  final List<PopupMenuEntry> menuEntries = [
+    PopupMenuItem(
+      value: 1,
+      child: Text('One'),
+    ),
+    PopupMenuItem(
+      value: 2,
+      child: Text('Two'),
+    ),
+  ];
+
+
+  _onLongPressCard(cardItem, LongPressStartDetails details)
+  {
+    List<String> choices = ["Delete", "Edit"];
+
+    showMenu(
+      position: RelativeRect.fromLTRB(10, details.globalPosition.dy, 10, 0), // fix that so it pops up at proper place
+      items: <PopupMenuEntry>[
+        PopupMenuItem(
+          value: 0,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.delete),
+              Text("Delete"),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 1,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.edit),
+              Text("Edit"),
+            ],
+          ),
+        )
+      ],
+      context: context,
+
+    ).then((onValue) {
+      _choiceAction(onValue, cardItem);
+    });
+    
+
+
+
+
+
+  }
+
+  void _choiceAction(int choice, cardItem)
+  {
+    switch(choice)
+    {
+      case 0:
+        _deleteCard(cardItem);
+        break;
+      case 1:
+
+        break;
+    }
   }
 
   _horizontalDragCard(details)
@@ -254,10 +321,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  void _deleteCard()
+  void _deleteCard(card)
   {
     setState(() {
-      cardsList.removeAt(cardIndex);
+      cardsList.remove(card);
       if(cardIndex > cardsList.length)
         cardIndex--;
     });
