@@ -258,12 +258,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ).then((onValue) {
       _choiceAction(onValue, cardItem);
     });
-    
-
-
-
-
-
   }
 
   void _choiceAction(int choice, cardItem)
@@ -274,7 +268,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         _deleteCard(cardItem);
         break;
       case 1:
-
+        _editCard(cardItem);
         break;
     }
   }
@@ -328,6 +322,47 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if(cardIndex > cardsList.length)
         cardIndex--;
     });
+  }
+
+  void _editCard(CardItemModel card) async
+  {
+    final myController = TextEditingController();
+    myController.text = card.cardTitle;
+    await showDialog<String>(
+      context: context,
+      builder: (context) =>
+      new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Title'),
+                controller: myController,
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('Save'),
+              onPressed: () {
+                setState(() {
+                  if (myController.text.length > 0)
+                    card.cardTitle = myController.text;
+                });
+                Navigator.pop(context);
+              })
+        ],
+      ),
+    );
   }
 
   void _onPressFloatingAddButton()
