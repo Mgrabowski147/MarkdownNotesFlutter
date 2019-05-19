@@ -13,7 +13,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     Color.fromRGBO(231, 129, 109, 1.0),
     Color.fromRGBO(99, 138, 223, 1.0),
     Color.fromRGBO(111, 194, 173, 1.0),
-    Color.fromRGBO(231, 129, 109, 1.0),
   ];
 
   var cardIndex = 0;
@@ -40,6 +39,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return new Scaffold(
       backgroundColor: currentColor,
+      resizeToAvoidBottomPadding: false,
       appBar: new AppBar(
         title: new Text(
           "Markdown Notes",
@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
         ),
       ),
-      floatingActionButton: new IconButton(padding: EdgeInsets.only(bottom: 35), icon: const Icon(Icons.add_circle), onPressed: _showTextField, color: appColors[(cardIndex+1)%appColors.length], iconSize: 48, ),
+      floatingActionButton: new IconButton(padding: EdgeInsets.only(bottom: 35), icon: const Icon(Icons.add_circle), onPressed: _onPressFloatingAddButton, color: appColors[(cardIndex+1)%appColors.length], iconSize: 48, ),
     );
   }
 
@@ -263,12 +263,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  void _showTextField()
+  void _onPressFloatingAddButton()
   {
-    _showDialog();
+    _addNewCard();
   }
 
-  _showDialog() async {
+  _addNewCard() async {
     final myController = TextEditingController();
     await showDialog<String>(
       context: context,
