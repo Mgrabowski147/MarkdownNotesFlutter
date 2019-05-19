@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:markdown_notes_flutter/auth/auth.dart';
 import 'package:markdown_notes_flutter/editor-widget/lookupWidget.dart';
 import 'CardItemModel.dart';
 import 'editor-widget/markdownEditorWidget.dart';
@@ -40,6 +41,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
     return new Scaffold(
       backgroundColor: currentColor,
       appBar: new AppBar(
