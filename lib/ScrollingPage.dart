@@ -230,9 +230,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   _onLongPressCard(cardItem, LongPressStartDetails details)
   {
     List<String> choices = ["Delete", "Edit"];
-
     showMenu(
-      position: RelativeRect.fromLTRB(10, details.globalPosition.dy, 10, 0), // fix that so it pops up at proper place
+      position: RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, details.globalPosition.dx, 0),
       items: <PopupMenuEntry>[
         PopupMenuItem(
           value: 0,
@@ -256,21 +255,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context: context,
 
     ).then((onValue) {
-      _choiceAction(onValue, cardItem);
+      switch(onValue)
+      {
+        case 0:
+          _deleteCard(cardItem);
+          break;
+        case 1:
+          _editCard(cardItem);
+          break;
+      }
     });
-  }
-
-  void _choiceAction(int choice, cardItem)
-  {
-    switch(choice)
-    {
-      case 0:
-        _deleteCard(cardItem);
-        break;
-      case 1:
-        _editCard(cardItem);
-        break;
-    }
   }
 
   _horizontalDragCard(details)
