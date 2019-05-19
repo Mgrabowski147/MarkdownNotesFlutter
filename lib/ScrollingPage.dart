@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:markdown_notes_flutter/editor-widget/lookupWidget.dart';
 import 'CardItemModel.dart';
 import 'editor-widget/markdownEditorWidget.dart';
 import 'editor-widget/mdDocument.dart';
@@ -19,9 +20,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   var currentColor = Color.fromRGBO(231, 129, 109, 1.0);
 
   var cardsList = [
-    CardItemModel("Personal", Icons.account_circle, 9, 0.83, Color.fromRGBO(231, 129, 109, 1.0)),
-    CardItemModel("Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
-    CardItemModel("Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0))
+    CardItemModel("Personal", Icons.account_circle, 9, 0.83,
+        Color.fromRGBO(231, 129, 109, 1.0)),
+    CardItemModel(
+        "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
+    CardItemModel(
+        "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0))
   ];
 
   AnimationController animationController;
@@ -117,7 +121,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, position) {
                       return _buildCard(cardsList[position]);
-                        // cardsList.map((card) => _buildCard(card));
+                      // cardsList.map((card) => _buildCard(card));
                     },
                   ),
                 ),
@@ -162,15 +166,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ...cardItem
-                          .documents
+                      ...cardItem.documents
                           // TODO: .sort((doc) => doc.editDate)
                           .take(2)
                           .map(
                             (doc) => Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0, vertical: 1.0),
-                                child: _buildMarkdownDocumentRow(doc)),
+                                child:
+                                    _buildMarkdownDocumentRow(cardItem, doc)),
                           ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -182,17 +186,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text("${cardItem.cardTitle}",
-                                style: TextStyle(fontSize: 28.0)),
-                            Icon(
-                              Icons.add,
-                              color: Colors.grey,
-                            ),
-                          ],
+                            horizontal: 0.0, vertical: 8.0),
+                        child: new ListTile(
+                          trailing: Icon(
+                            Icons.add,
+                            color: Colors.grey,
+                          ),
+                          title: Text("${cardItem.cardTitle}",
+                              style: TextStyle(fontSize: 28.0)),
+                          onTap: () async {
+                            // TODO get new guid and push to db
+                            var document = new MdDocument();
+                            document.name = "New markdown document";
+
+                            final documentAfterEdit =
+                                await Navigator.of(context)
+                                    .push<MdDocument>(new MaterialPageRoute(
+                              builder: (context) =>
+                                  MarkdownEditorWidget(document),
+                            ));
+
+                            setState(() {
+                              cardItem.documents.remove(document);
+                              cardItem.documents.add(documentAfterEdit);
+                            });
+                          },
                         ),
                       ),
                     ],
@@ -219,14 +237,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         if (details.velocity.pixelsPerSecond.dx > 0) {
           if (cardIndex > 0) {
             cardIndex--;
-            colorTween =
-                ColorTween(begin: currentColor, end: cardItem.color);
+            colorTween = ColorTween(begin: currentColor, end: cardItem.color);
           }
         } else {
           if (cardIndex < 2) {
             cardIndex++;
-            colorTween =
-                ColorTween(begin: currentColor, end: cardItem.color);
+            colorTween = ColorTween(begin: currentColor, end: cardItem.color);
           }
         }
         setState(() {
@@ -242,7 +258,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMarkdownDocumentRow(MdDocument document) {
+  Widget _buildMarkdownDocumentRow(
+      CardItemModel cardItem, MdDocument document) {
     // final bool alreadyDone = item.done;
 
     return new ListTile(
@@ -251,13 +268,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
       trailing: new Icon(
         // Add the lines from here...
-        Icons.edit,
+        Icons.search,
         color: Colors.orange,
       ),
       onTap: () async {
-        await Navigator.of(context).push(new MaterialPageRoute(
+        await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
+          builder: (context) => MarkdownLookupWidget(document),
+        ));
+      },
+      onLongPress: () async {
+        // TODO push changes to db
+
+        final documentAfterEdit =
+            await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
           builder: (context) => MarkdownEditorWidget(document),
         ));
+
+        setState(() {
+          cardItem.documents.remove(document);
+          cardItem.documents.add(documentAfterEdit);
+        });
       },
       contentPadding: EdgeInsets.only(bottom: 0.0),
       dense: true,

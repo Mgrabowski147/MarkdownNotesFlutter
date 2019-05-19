@@ -1,5 +1,5 @@
 class MdDocument{
   String uuid;
-  String content;
+  String content = "";
   String name;
 }

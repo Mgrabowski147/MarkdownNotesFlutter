@@ -5,8 +5,14 @@ import 'mdDocument.dart';
 
 class MarkdownEditorWidget extends StatefulWidget {
   final MdDocument mdDocument;
+  MdDocument editMdDocument;
 
-  MarkdownEditorWidget(this.mdDocument);
+  MarkdownEditorWidget(this.mdDocument) {
+    this.editMdDocument = new MdDocument();
+    this.editMdDocument.content = this.mdDocument.content;
+    this.editMdDocument.name = this.mdDocument.name;
+    this.editMdDocument.uuid = this.mdDocument.uuid;
+  }
 
   @override
   MarkdownEditorState createState() => new MarkdownEditorState();
@@ -18,15 +24,14 @@ class MarkdownEditorState extends State<MarkdownEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _documentNameController.text = widget.mdDocument.name;
-    _documentContentController.text = widget.mdDocument.content;
+    _documentNameController.text = widget.editMdDocument.name;
+    _documentContentController.text = widget.editMdDocument.content;
 
     return new Scaffold(
       appBar: new AppBar(
         title: const Text('Editor'),
         actions: <Widget>[
-          new IconButton(
-              icon: const Icon(Icons.pageview), onPressed: _lookup),
+          new IconButton(icon: const Icon(Icons.pageview), onPressed: _lookup),
           new IconButton(icon: const Icon(Icons.save), onPressed: _saveItem),
         ],
       ),
@@ -67,22 +72,22 @@ class MarkdownEditorState extends State<MarkdownEditorWidget> {
     // Navigator.of(context).pop(_deleteTodoItem);
   }
 
-  void _lookup() async{
-    var lookupDoc = new MdDocument();
+  void _lookup() async {
+    var lookupDoc = this.widget.editMdDocument;
     lookupDoc.content = _documentContentController.text;
+    lookupDoc.name = _documentNameController.text;
+
     await Navigator.of(context).push(new MaterialPageRoute(
-            builder: (context) => MarkdownLookupWidget(lookupDoc),
-          ));
+      builder: (context) => MarkdownLookupWidget(lookupDoc),
+    ));
   }
 
   void _saveItem() {
-    // final String _content = _todoItemContentController.text;
-
     print(_documentContentController.text);
-    // final _todoItem =
-    //     new TodoItem(_content, widget.editItem.done, widget.editItem.id);
 
-    // Navigator.of(context).pop(_todoItem);
-    Navigator.of(context).pop();
+    this.widget.editMdDocument.content = _documentContentController.text;
+    this.widget.editMdDocument.name = _documentNameController.text;
+
+    Navigator.of(context).pop(this.widget.editMdDocument);
   }
 }
