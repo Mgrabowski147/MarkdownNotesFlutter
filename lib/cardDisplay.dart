@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'CardItemModel.dart';
 import 'editor-widget/markdownEditorWidget.dart';
 import 'editor-widget/mdDocument.dart';
+import 'editor-widget/lookupWidget.dart';
 import 'cardDisplayArgs.dart';
 
 class CardDisplay extends StatefulWidget {
 
-  CardDisplayArgs arguments;
+  final CardDisplayArgs arguments;
 
   @override
   _CardDisplayState createState() => new _CardDisplayState(arguments);
 
-  CardDisplay(arg)
-  {
-    arguments = arg;
-  }
+  CardDisplay(this.arguments);
 }
 
 
@@ -46,14 +43,14 @@ class _CardDisplayState extends State<CardDisplay> {
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.search),
           ),
         ],
         elevation: 0.0,
       ),
       body: new Center(
         child: Column(
-          children: <Widget>[                Padding(
+          children: <Widget>[
+            Padding(
             padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,13 +76,14 @@ class _CardDisplayState extends State<CardDisplay> {
     // final bool alreadyDone = item.done;
 
     return new ListTile(
+
       title: new Text(document.name, style: TextStyle(fontSize: 20.0)
         // style: alreadyDone ? _lineThrough : _biggerFont,
       ),
-      trailing: new Icon(
+      trailing: new IconButton(
         // Add the lines from here...
-        Icons.edit,
-        color: Colors.orange,
+        icon: new Icon(Icons.pageview),
+        onPressed: () { _lookup(document); },
       ),
       onTap: () async {
         await Navigator.of(context).push(new MaterialPageRoute(
@@ -95,5 +93,13 @@ class _CardDisplayState extends State<CardDisplay> {
       contentPadding: EdgeInsets.only(bottom: 0.0),
       dense: true,
     );
+  }
+
+  void _lookup(document) async{
+    var lookupDoc = new MdDocument();
+    lookupDoc.content = document.content == null ? "" : document.content;
+    Navigator.of(context).push(new MaterialPageRoute(
+      builder: (context) => MarkdownLookupWidget(lookupDoc),
+    ));
   }
 }
