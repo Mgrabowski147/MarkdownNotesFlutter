@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'CardItemModel.dart';
 import 'editor-widget/markdownEditorWidget.dart';
 import 'editor-widget/mdDocument.dart';
+import 'cardDisplayArgs.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,6 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+
   var appColors = [
     Color.fromRGBO(231, 129, 109, 1.0),
     Color.fromRGBO(99, 138, 223, 1.0),
@@ -210,6 +212,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       onHorizontalDragEnd: _horizontalDragCard,
       onLongPressStart: (details) { _onLongPressCard(cardItem, details); },
+      onTap: () { Navigator.pushNamed(context, '/cardDisplay', arguments: new CardDisplayArgs(cardItem.color)); },
     );
   }
 
