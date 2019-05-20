@@ -6,14 +6,14 @@ import 'cardDisplayArgs.dart';
 
 class CardDisplay extends StatefulWidget {
 
-  CardDisplayArgs args;
+  CardDisplayArgs arguments;
 
   @override
-  _CardDisplayState createState() => new _CardDisplayState(args);
+  _CardDisplayState createState() => new _CardDisplayState(arguments);
 
   CardDisplay(arg)
   {
-    args = arg;
+    arguments = arg;
   }
 }
 
@@ -21,11 +21,14 @@ class CardDisplay extends StatefulWidget {
 class _CardDisplayState extends State<CardDisplay> {
 
   Color currentColor;
+  String title;
+  List<MdDocument> documents;
 
-
-  _CardDisplayState(CardDisplayArgs argument)
+  _CardDisplayState(CardDisplayArgs arguments)
   {
-    currentColor = argument.color;
+    currentColor = arguments.color;
+    title = arguments.title;
+    documents = arguments.documents;
   }
 
   @override
@@ -35,7 +38,7 @@ class _CardDisplayState extends State<CardDisplay> {
       resizeToAvoidBottomPadding: false,
       appBar: new AppBar(
         title: new Text(
-          "Markdown Notes",
+          title,
           style: TextStyle(fontSize: 16.0),
         ),
         backgroundColor: currentColor,
@@ -48,6 +51,49 @@ class _CardDisplayState extends State<CardDisplay> {
         ],
         elevation: 0.0,
       ),
+      body: new Center(
+        child: Column(
+          children: <Widget>[                Padding(
+            padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                ...documents
+                // TODO: .sort((doc) => doc.editDate)
+                    .take(2)
+                    .map(
+                      (doc) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 1.0),
+                      child: _buildMarkdownDocumentRow(doc)),
+                ),
+              ],
+            ),
+          )],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMarkdownDocumentRow(MdDocument document) {
+    // final bool alreadyDone = item.done;
+
+    return new ListTile(
+      title: new Text(document.name, style: TextStyle(fontSize: 20.0)
+        // style: alreadyDone ? _lineThrough : _biggerFont,
+      ),
+      trailing: new Icon(
+        // Add the lines from here...
+        Icons.edit,
+        color: Colors.orange,
+      ),
+      onTap: () async {
+        await Navigator.of(context).push(new MaterialPageRoute(
+          builder: (context) => MarkdownEditorWidget(document),
+        ));
+      },
+      contentPadding: EdgeInsets.only(bottom: 0.0),
+      dense: true,
     );
   }
 }

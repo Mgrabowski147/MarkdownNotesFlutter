@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       onHorizontalDragEnd: _horizontalDragCard,
       onLongPressStart: (details) { _onLongPressCard(cardItem, details); },
-      onTap: () { Navigator.pushNamed(context, '/cardDisplay', arguments: new CardDisplayArgs(cardItem.color)); },
+      onTap: () { Navigator.pushNamed(context, '/cardDisplay', arguments: new CardDisplayArgs(cardItem.color, cardItem.cardTitle, cardItem.documents)); },
     );
   }
 
