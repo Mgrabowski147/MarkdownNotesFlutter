@@ -12,7 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-
   var appColors = [
     Color.fromRGBO(231, 129, 109, 1.0),
     Color.fromRGBO(99, 138, 223, 1.0),
@@ -44,7 +43,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
       backgroundColor: currentColor,
       resizeToAvoidBottomPadding: false,
@@ -126,10 +124,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     itemCount: cardsList.length,
                     controller: scrollController,
                     scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, position) {
-                return _buildCard(cardsList[position]);
-                // cardsList.map((card) => _buildCard(card));
-                },
+                    itemBuilder: (context, position) {
+                      return _buildCard(cardsList[position]);
+                      // cardsList.map((card) => _buildCard(card));
+                    },
                   ),
                 ),
               ],
@@ -137,7 +135,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
         ),
       ),
-      floatingActionButton: new IconButton(padding: EdgeInsets.only(bottom: 35), icon: const Icon(Icons.add_circle), onPressed: _onPressFloatingAddButton, color: appColors[(cardIndex+1)%appColors.length], iconSize: 48, ),
+      floatingActionButton: new IconButton(
+        padding: EdgeInsets.only(bottom: 35),
+        icon: const Icon(Icons.add_circle),
+        onPressed: _onPressFloatingAddButton,
+        color: appColors[(cardIndex + 1) % appColors.length],
+        iconSize: 48,
+      ),
     );
   }
 
@@ -227,16 +231,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
       ),
       onHorizontalDragEnd: _horizontalDragCard,
-      onLongPressStart: (details) { _onLongPressCard(cardItem, details); },
-      onTap: () { Navigator.pushNamed(context, '/cardDisplay', arguments: new CardDisplayArgs(cardItem.color, cardItem.cardTitle, cardItem.documents)); },
+      onLongPressStart: (details) {
+        _onLongPressCard(cardItem, details);
+      },
+      onTap: () {
+        Navigator.pushNamed(context, '/cardDisplay',
+            arguments: new CardDisplayArgs(
+                cardItem.color, cardItem.cardTitle, cardItem.documents));
+      },
     );
   }
 
-  final  popupButtonKey = GlobalKey<State>(); // We use `State` because Flutter libs do not export `PopupMenuButton` state specifically.
+  final popupButtonKey = GlobalKey<
+      State>(); // We use `State` because Flutter libs do not export `PopupMenuButton` state specifically.
 
   final List<PopupMenuEntry> menuEntries = [
     PopupMenuItem(
@@ -249,12 +260,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ),
   ];
 
-
-  _onLongPressCard(cardItem, LongPressStartDetails details)
-  {
+  _onLongPressCard(cardItem, LongPressStartDetails details) {
     List<String> choices = ["Delete", "Edit"];
     showMenu(
-      position: RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, details.globalPosition.dx, 0),
+      position: RelativeRect.fromLTRB(details.globalPosition.dx,
+          details.globalPosition.dy, details.globalPosition.dx, 0),
       items: <PopupMenuEntry>[
         PopupMenuItem(
           value: 0,
@@ -276,10 +286,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         )
       ],
       context: context,
-
     ).then((onValue) {
-      switch(onValue)
-      {
+      switch (onValue) {
         case 0:
           _deleteCard(cardItem);
           break;
@@ -290,17 +298,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  _horizontalDragCard(details)
-  {
-    animationController = AnimationController(vsync: this,
-        duration: Duration(milliseconds: 500));
+  _horizontalDragCard(details) {
+    animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     curvedAnimation = CurvedAnimation(
-        parent: animationController,
-        curve: Curves.fastOutSlowIn);
+        parent: animationController, curve: Curves.fastOutSlowIn);
     animationController.addListener(() {
       setState(() {
-        currentColor =
-            colorTween.evaluate(curvedAnimation);
+        currentColor = colorTween.evaluate(curvedAnimation);
       });
     });
     bool animate = false;
@@ -308,82 +313,74 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if (cardIndex > 0) {
         animate = true;
         cardIndex--;
-        colorTween = ColorTween(begin: currentColor,
-            end: appColors[cardIndex%3]);
+        colorTween =
+            ColorTween(begin: currentColor, end: appColors[cardIndex % 3]);
       }
     } else {
       if (cardIndex < cardsList.length - 1) {
         animate = true;
         cardIndex++;
-        colorTween = ColorTween(begin: currentColor,
-            end: appColors[cardIndex%3]);
+        colorTween =
+            ColorTween(begin: currentColor, end: appColors[cardIndex % 3]);
       }
     }
 
-    if(animate)
-    {
+    if (animate) {
       setState(() {
         scrollController.animateTo((cardIndex) * 256.0,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.fastOutSlowIn);
+            duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
       });
       colorTween.animate(curvedAnimation);
       animationController.forward();
     }
   }
 
-  void _deleteCard(card)
-  {
+  void _deleteCard(card) {
     setState(() {
       cardsList.remove(card);
-      if(cardIndex > cardsList.length)
-        cardIndex--;
+      if (cardIndex > cardsList.length) cardIndex--;
     });
   }
 
-  void _editCard(CardItemModel card) async
-  {
+  void _editCard(CardItemModel card) async {
     final myController = TextEditingController();
     myController.text = card.cardTitle;
     await showDialog<String>(
       context: context,
-      builder: (context) =>
-      new AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: new Row(
-          children: <Widget>[
-            new Expanded(
-              child: new TextField(
-                autofocus: true,
-                decoration: new InputDecoration(
-                    labelText: 'Title'),
-                controller: myController,
-              ),
-            )
-          ],
-        ),
-        actions: <Widget>[
-          new FlatButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          new FlatButton(
-              child: const Text('Save'),
-              onPressed: () {
-                setState(() {
-                  if (myController.text.length > 0)
-                    card.cardTitle = myController.text;
-                });
-                Navigator.pop(context);
-              })
-        ],
-      ),
+      builder: (context) => new AlertDialog(
+            contentPadding: const EdgeInsets.all(16.0),
+            content: new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: new TextField(
+                    autofocus: true,
+                    decoration: new InputDecoration(labelText: 'Title'),
+                    controller: myController,
+                  ),
+                )
+              ],
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+              new FlatButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    setState(() {
+                      if (myController.text.length > 0)
+                        card.cardTitle = myController.text;
+                    });
+                    Navigator.pop(context);
+                  })
+            ],
+          ),
     );
   }
 
-  void _onPressFloatingAddButton()
-  {
+  void _onPressFloatingAddButton() {
     _addNewCard();
   }
 
@@ -391,38 +388,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final myController = TextEditingController();
     await showDialog<String>(
       context: context,
-      builder: (context) =>
-      new AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: new Row(
-          children: <Widget>[
-            new Expanded(
-              child: new TextField(
-                autofocus: true,
-                decoration: new InputDecoration(
-                    labelText: 'Product'),
-                controller: myController,
-              ),
-            )
-          ],
-        ),
-        actions: <Widget>[
-          new FlatButton(
-              child: const Text('CANCEL'),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          new FlatButton(
-              child: const Text('ADD'),
-              onPressed: () {
-                setState(() {
-                  if (myController.text.length > 0)
-                    cardsList.add(CardItemModel(myController.text, Icons.account_circle, 9, 0.83, appColors[0]));
-                });
-                Navigator.pop(context);
-              })
-        ],
-      ),
+      builder: (context) => new AlertDialog(
+            contentPadding: const EdgeInsets.all(16.0),
+            content: new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: new TextField(
+                    autofocus: true,
+                    decoration: new InputDecoration(labelText: 'Product'),
+                    controller: myController,
+                  ),
+                )
+              ],
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                  child: const Text('CANCEL'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+              new FlatButton(
+                  child: const Text('ADD'),
+                  onPressed: () {
+                    setState(() {
+                      if (myController.text.length > 0)
+                        cardsList.add(CardItemModel(myController.text,
+                            Icons.account_circle, 9, 0.83, appColors[0]));
+                    });
+                    Navigator.pop(context);
+                  })
+            ],
+          ),
     );
   }
 
@@ -451,11 +447,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
           builder: (context) => MarkdownEditorWidget(document),
         ));
-
-        setState(() {
-          cardItem.documents.remove(document);
-          cardItem.documents.add(documentAfterEdit);
-        });
+        if (documentAfterEdit != null) {
+          setState(() {
+            cardItem.documents.remove(document);
+            cardItem.documents.add(documentAfterEdit);
+          });
+        }
       },
       contentPadding: EdgeInsets.only(bottom: 0.0),
       dense: true,
