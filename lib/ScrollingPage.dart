@@ -4,6 +4,7 @@ import 'package:markdown_notes_flutter/editor-widget/lookupWidget.dart';
 import 'CardItemModel.dart';
 import 'editor-widget/markdownEditorWidget.dart';
 import 'editor-widget/mdDocument.dart';
+import 'cardDisplayArgs.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,11 +12,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  // var appColors = [
-  //   ,
-  //   ,
 
-  // ];
+  var appColors = [
+    Color.fromRGBO(231, 129, 109, 1.0),
+    Color.fromRGBO(99, 138, 223, 1.0),
+    Color.fromRGBO(111, 194, 173, 1.0),
+  ];
+
   var cardIndex = 0;
   ScrollController scrollController;
   var currentColor = Color.fromRGBO(231, 129, 109, 1.0);
@@ -44,6 +47,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     return new Scaffold(
       backgroundColor: currentColor,
+      resizeToAvoidBottomPadding: false,
       appBar: new AppBar(
         title: new Text(
           "Markdown Notes",
@@ -59,6 +63,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
         elevation: 0.0,
       ),
+      drawer: Drawer(),
       body: new Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,13 +123,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   height: 280.0,
                   child: ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: 3,
+                    itemCount: cardsList.length,
                     controller: scrollController,
                     scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, position) {
-                      return _buildCard(cardsList[position]);
-                      // cardsList.map((card) => _buildCard(card));
-                    },
+                  itemBuilder: (context, position) {
+                return _buildCard(cardsList[position]);
+                // cardsList.map((card) => _buildCard(card));
+                },
                   ),
                 ),
               ],
@@ -132,7 +137,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
         ),
       ),
-      drawer: Drawer(),
+      floatingActionButton: new IconButton(padding: EdgeInsets.only(bottom: 35), icon: const Icon(Icons.add_circle), onPressed: _onPressFloatingAddButton, color: appColors[(cardIndex+1)%appColors.length], iconSize: 48, ),
     );
   }
 
@@ -222,41 +227,202 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ),
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
       ),
-      onHorizontalDragEnd: (details) {
-        animationController = AnimationController(
-            vsync: this, duration: Duration(milliseconds: 500));
-        curvedAnimation = CurvedAnimation(
-            parent: animationController, curve: Curves.fastOutSlowIn);
-        animationController.addListener(() {
-          setState(() {
-            currentColor = colorTween.evaluate(curvedAnimation);
-          });
-        });
+      onHorizontalDragEnd: _horizontalDragCard,
+      onLongPressStart: (details) { _onLongPressCard(cardItem, details); },
+      onTap: () { Navigator.pushNamed(context, '/cardDisplay', arguments: new CardDisplayArgs(cardItem.color, cardItem.cardTitle, cardItem.documents)); },
+    );
+  }
 
-        if (details.velocity.pixelsPerSecond.dx > 0) {
-          if (cardIndex > 0) {
-            cardIndex--;
-            colorTween = ColorTween(begin: currentColor, end: cardItem.color);
-          }
-        } else {
-          if (cardIndex < 2) {
-            cardIndex++;
-            colorTween = ColorTween(begin: currentColor, end: cardItem.color);
-          }
-        }
-        setState(() {
-          scrollController.animateTo((cardIndex) * 256.0,
-              duration: Duration(milliseconds: 500),
-              curve: Curves.fastOutSlowIn);
-        });
+  final  popupButtonKey = GlobalKey<State>(); // We use `State` because Flutter libs do not export `PopupMenuButton` state specifically.
 
-        colorTween.animate(curvedAnimation);
+  final List<PopupMenuEntry> menuEntries = [
+    PopupMenuItem(
+      value: 1,
+      child: Text('One'),
+    ),
+    PopupMenuItem(
+      value: 2,
+      child: Text('Two'),
+    ),
+  ];
 
-        animationController.forward();
-      },
+
+  _onLongPressCard(cardItem, LongPressStartDetails details)
+  {
+    List<String> choices = ["Delete", "Edit"];
+    showMenu(
+      position: RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, details.globalPosition.dx, 0),
+      items: <PopupMenuEntry>[
+        PopupMenuItem(
+          value: 0,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.delete),
+              Text("Delete"),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 1,
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.edit),
+              Text("Edit"),
+            ],
+          ),
+        )
+      ],
+      context: context,
+
+    ).then((onValue) {
+      switch(onValue)
+      {
+        case 0:
+          _deleteCard(cardItem);
+          break;
+        case 1:
+          _editCard(cardItem);
+          break;
+      }
+    });
+  }
+
+  _horizontalDragCard(details)
+  {
+    animationController = AnimationController(vsync: this,
+        duration: Duration(milliseconds: 500));
+    curvedAnimation = CurvedAnimation(
+        parent: animationController,
+        curve: Curves.fastOutSlowIn);
+    animationController.addListener(() {
+      setState(() {
+        currentColor =
+            colorTween.evaluate(curvedAnimation);
+      });
+    });
+    bool animate = false;
+    if (details.velocity.pixelsPerSecond.dx > 0) {
+      if (cardIndex > 0) {
+        animate = true;
+        cardIndex--;
+        colorTween = ColorTween(begin: currentColor,
+            end: appColors[cardIndex%3]);
+      }
+    } else {
+      if (cardIndex < cardsList.length - 1) {
+        animate = true;
+        cardIndex++;
+        colorTween = ColorTween(begin: currentColor,
+            end: appColors[cardIndex%3]);
+      }
+    }
+
+    if(animate)
+    {
+      setState(() {
+        scrollController.animateTo((cardIndex) * 256.0,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.fastOutSlowIn);
+      });
+      colorTween.animate(curvedAnimation);
+      animationController.forward();
+    }
+  }
+
+  void _deleteCard(card)
+  {
+    setState(() {
+      cardsList.remove(card);
+      if(cardIndex > cardsList.length)
+        cardIndex--;
+    });
+  }
+
+  void _editCard(CardItemModel card) async
+  {
+    final myController = TextEditingController();
+    myController.text = card.cardTitle;
+    await showDialog<String>(
+      context: context,
+      builder: (context) =>
+      new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Title'),
+                controller: myController,
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('Save'),
+              onPressed: () {
+                setState(() {
+                  if (myController.text.length > 0)
+                    card.cardTitle = myController.text;
+                });
+                Navigator.pop(context);
+              })
+        ],
+      ),
+    );
+  }
+
+  void _onPressFloatingAddButton()
+  {
+    _addNewCard();
+  }
+
+  _addNewCard() async {
+    final myController = TextEditingController();
+    await showDialog<String>(
+      context: context,
+      builder: (context) =>
+      new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Product'),
+                controller: myController,
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('ADD'),
+              onPressed: () {
+                setState(() {
+                  if (myController.text.length > 0)
+                    cardsList.add(CardItemModel(myController.text, Icons.account_circle, 9, 0.83, appColors[0]));
+                });
+                Navigator.pop(context);
+              })
+        ],
+      ),
     );
   }
 
