@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:markdown_notes_flutter/auth/auth.dart';
 import 'package:markdown_notes_flutter/editor-widget/lookupWidget.dart';
 import 'CardItemModel.dart';
+import 'data-store/DbStore.dart';
 import 'editor-widget/markdownEditorWidget.dart';
 import 'editor-widget/mdDocument.dart';
 import 'cardDisplayArgs.dart';
@@ -25,10 +26,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   var cardsList = [
     CardItemModel("Personal", Icons.account_circle, 9, 0.83,
         Color.fromRGBO(231, 129, 109, 1.0)),
-    CardItemModel(
-        "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
-    CardItemModel(
-        "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0))
+    // CardItemModel(
+    //     "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
+    // CardItemModel(
+    //     "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0)),
   ];
 
   AnimationController animationController;
@@ -43,6 +44,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // var signIntoFirebase = Auth.signIntoFirebase();
+
     return new Scaffold(
       backgroundColor: currentColor,
       resizeToAvoidBottomPadding: false,
@@ -119,14 +122,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 280.0,
-                  child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: cardsList.length,
-                    controller: scrollController,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, position) {
-                      return _buildCard(cardsList[position]);
-                      // cardsList.map((card) => _buildCard(card));
+                  child: new FutureBuilder(
+                    future: _getData(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                          return new Text('loading...');
+                        default:
+                          if (snapshot.hasError)
+                            return new Text('Error: ${snapshot.error}');
+                          else {
+                            cardsList = snapshot.data;
+                            return ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: cardsList.length,
+                              controller: scrollController,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, position) {
+                                return _buildCard(cardsList[position]);
+                                // cardsList.map((card) => _buildCard(card));
+                              },
+                            );
+                          }
+                      }
                     },
                   ),
                 ),
@@ -143,6 +162,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         iconSize: 48,
       ),
     );
+  }
+
+  Future<List<CardItemModel>> _getData() async {
+    var futureCardsList = [
+      CardItemModel("Personal",
+      Icons.account_circle,
+      9,
+      0.83,
+      Color.fromRGBO(231, 129, 109, 1.0)),
+      CardItemModel(
+          "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
+      CardItemModel(
+          "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0)),
+    ];
+
+    return await DbStore.getUserCards();
+
+    // return futureCardsList;
   }
 
   Widget _buildCard(CardItemModel cardItem) {
@@ -216,11 +253,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               builder: (context) =>
                                   MarkdownEditorWidget(document),
                             ));
-
-                            setState(() {
-                              cardItem.documents.remove(document);
-                              cardItem.documents.add(documentAfterEdit);
-                            });
+                            if (documentAfterEdit != null) {
+                              setState(() {
+                                cardItem.documents.remove(document);
+                                cardItem.documents.add(documentAfterEdit);
+                              });
+                            }
                           },
                         ),
                       ),
@@ -457,5 +495,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       contentPadding: EdgeInsets.only(bottom: 0.0),
       dense: true,
     );
+  }
+
+  // LOGGING IN
+  var mUser;
+  var mUserName;
+  var isLoggingIn = false;
+
+  Future clickLogin() async {
+    //Set isLoggingIn to true at the start of clicking Login
+    setState(() {
+      isLoggingIn = true;
+    });
+
+    mUser = await loginWithGoogle().catchError((e) => setState(() {
+          isLoggingIn = false;
+        }));
+    assert(mUser != null);
+
+    setState(() {
+      isLoggingIn = false;
+      mUserName = mUser.displayName;
+    });
   }
 }

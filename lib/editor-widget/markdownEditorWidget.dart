@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:markdown_notes_flutter/data-store/DbStore.dart';
 
 import 'lookupWidget.dart';
 import 'mdDocument.dart';
@@ -76,6 +77,8 @@ class MarkdownEditorState extends State<MarkdownEditorWidget> {
     var lookupDoc = this.widget.editMdDocument;
     lookupDoc.content = _documentContentController.text;
     lookupDoc.name = _documentNameController.text;
+
+    // await new DbStore().updateUserData();
 
     await Navigator.of(context).push(new MaterialPageRoute(
       builder: (context) => MarkdownLookupWidget(lookupDoc),
