@@ -298,7 +298,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       onTap: () async {
         await Navigator.of(context).push(new MaterialPageRoute(
           builder: (context) => CardDisplay(new CardDisplayArgs(
-              cardItem.color, cardItem.cardTitle, cardItem.documents)),
+              cardsList, cardItem)),
         ));
       },
     );

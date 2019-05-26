@@ -21,8 +21,10 @@ class DbStore {
     print(cardsCollection.data);
 
     var cards = new List<CardItemModel>();
-    for (int loop = 0; loop < cardsCollection.data['cards'].length; loop++) {
-      cards.add(CardItemModel.fromStore(cardsCollection.data['cards'][loop]));
+    if (cardsCollection.data['cards'] != null) {
+      for (int loop = 0; loop < cardsCollection.data['cards'].length; loop++) {
+        cards.add(CardItemModel.fromStore(cardsCollection.data['cards'][loop]));
+      }
     }
 
     return cards;

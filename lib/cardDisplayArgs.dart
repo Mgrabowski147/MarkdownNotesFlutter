@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:markdown_notes_flutter/CardItemModel.dart';
 import 'editor-widget/mdDocument.dart';
 
 class CardDisplayArgs {
-  Color color;
-  String title;
-  List<MdDocument> documents;
+  // Color color;
+  // String title;
+  // List<MdDocument> documents;
+  List<CardItemModel> cardsList;
+  CardItemModel openCard;
 
-  CardDisplayArgs(color, title, documents)
-  {
-    this.color = color;
-    this.title = title;
-    this.documents = documents;
+  CardDisplayArgs(List<CardItemModel> cardsList, CardItemModel openCard) {
+    this.cardsList = cardsList;
+    this.openCard = openCard;
+    // this.color = color;
+    // this.title = title;
+    // this.documents = documents;
   }
 }
