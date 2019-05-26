@@ -25,4 +25,9 @@ class CardItemModel {
 
     return cardItemModel;
   }
+
+  Map<String, dynamic> toStore() => {
+        'name': cardTitle,
+        'documents': documents.map((d) => d.toStore()).toList(),
+      };
 }

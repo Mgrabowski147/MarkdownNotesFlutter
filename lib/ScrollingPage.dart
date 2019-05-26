@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:markdown_notes_flutter/auth/auth.dart';
+import 'package:markdown_notes_flutter/cardDisplay.dart';
 import 'package:markdown_notes_flutter/editor-widget/lookupWidget.dart';
 import 'CardItemModel.dart';
 import 'data-store/DbStore.dart';
@@ -23,14 +24,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   ScrollController scrollController;
   var currentColor = Color.fromRGBO(231, 129, 109, 1.0);
 
-  var cardsList = [
-    CardItemModel("Personal", Icons.account_circle, 9, 0.83,
-        Color.fromRGBO(231, 129, 109, 1.0)),
-    // CardItemModel(
-    //     "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
-    // CardItemModel(
-    //     "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0)),
-  ];
+  List<CardItemModel> cardsList = null;
+
+  // [
+  //   CardItemModel("Personal", Icons.account_circle, 9, 0.83,
+  //       Color.fromRGBO(231, 129, 109, 1.0)),
+
+  // ];
 
   AnimationController animationController;
   ColorTween colorTween;
@@ -45,148 +45,155 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // var signIntoFirebase = Auth.signIntoFirebase();
-
     return new Scaffold(
-      backgroundColor: currentColor,
-      resizeToAvoidBottomPadding: false,
-      appBar: new AppBar(
-        title: new Text(
-          "Markdown Notes",
-          style: TextStyle(fontSize: 16.0),
-        ),
         backgroundColor: currentColor,
-        centerTitle: true,
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.search),
+        resizeToAvoidBottomPadding: false,
+        appBar: new AppBar(
+          title: new Text(
+            "Markdown Notes",
+            style: TextStyle(fontSize: 16.0),
           ),
-        ],
-        elevation: 0.0,
-      ),
-      drawer: Drawer(),
-      body: new Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(),
+          backgroundColor: currentColor,
+          centerTitle: true,
+          actions: <Widget>[
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 64.0, vertical: 24.0),
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Icon(
-                        Icons.account_circle,
-                        size: 45.0,
-                        color: Colors.white,
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Icon(Icons.search),
+            ),
+          ],
+          elevation: 0.0,
+        ),
+        drawer: Drawer(),
+        body: new Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 64.0, vertical: 24.0),
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Icon(
+                          Icons.account_circle,
+                          size: 45.0,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 12.0),
-                      child: Text(
-                        "Hello, Kate.",
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 12.0),
+                        child: Text(
+                          "Hello, Kate.",
+                          style: TextStyle(
+                              fontSize: 30.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      Text(
+                        "Looks like feel good.",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        "You have 3 tasks to do today.",
                         style: TextStyle(
-                            fontSize: 30.0,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400),
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "Looks like feel good.",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      "You have 3 tasks to do today.",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 64.0, vertical: 8.0),
-                  child: Text(
-                    "TODAY : JUL 21, 2018",
-                    style: TextStyle(color: Colors.white),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 64.0, vertical: 8.0),
+                    child: Text(
+                      "TODAY : JUL 21, 2018",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                ),
-                Container(
-                  height: 280.0,
-                  child: new FutureBuilder(
-                    future: _getData(),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                          return new Text('loading...');
-                        default:
-                          if (snapshot.hasError)
-                            return new Text('Error: ${snapshot.error}');
-                          else {
-                            cardsList = snapshot.data;
-                            return ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: cardsList.length,
-                              controller: scrollController,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, position) {
-                                return _buildCard(cardsList[position]);
-                                // cardsList.map((card) => _buildCard(card));
-                              },
-                            );
-                          }
-                      }
-                    },
+                  Container(
+                    height: 280.0,
+                    child: new FutureBuilder(
+                      future: _getData(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                            return new Text('loading...');
+                          default:
+                            if (snapshot.hasError)
+                              return new Text('Error: ${snapshot.error}');
+                            else {
+                              // cardsList = snapshot.data;
+                              // print(snapshot.data);
+                              var cardsWigets =
+                                  cardsList.map(_buildCard).toList();
+                              cardsWigets.add(_newCardButton());
+
+                              return new ListView(
+                                  children: cardsWigets,
+                                  controller: scrollController,
+                                  // physics: NeverScrollableScrollPhysics(),
+                                  scrollDirection: Axis.horizontal);
+
+                              return ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: cardsList.length,
+                                controller: scrollController,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, position) {
+                                  return _buildCard(cardsList[position]);
+                                  // cardsList.map((card) => _buildCard(card));
+                                },
+                              );
+                            }
+                        }
+                      },
+                    ),
                   ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: new IconButton(
-        padding: EdgeInsets.only(bottom: 35),
-        icon: const Icon(Icons.add_circle),
-        onPressed: _onPressFloatingAddButton,
-        color: appColors[(cardIndex + 1) % appColors.length],
-        iconSize: 48,
-      ),
-    );
+                ],
+              )
+            ],
+          ),
+        ));
   }
 
   Future<List<CardItemModel>> _getData() async {
-    var futureCardsList = [
-      CardItemModel("Personal",
-      Icons.account_circle,
-      9,
-      0.83,
-      Color.fromRGBO(231, 129, 109, 1.0)),
-      CardItemModel(
-          "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
-      CardItemModel(
-          "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0)),
-    ];
+    print('Future<List<CardItemModel>> _getData() called');
 
-    return await DbStore.getUserCards();
+    if (cardsList != null) {
+      return cardsList;
+    }
 
-    // return futureCardsList;
+    // var futureCardsList = [
+    //   CardItemModel("Personal", Icons.account_circle, 9, 0.83,
+    //       Color.fromRGBO(231, 129, 109, 1.0)),
+    //   CardItemModel(
+    //       "Work", Icons.work, 12, 0.24, Color.fromRGBO(99, 138, 223, 1.0)),
+    //   CardItemModel(
+    //       "Home", Icons.home, 7, 0.32, Color.fromRGBO(111, 194, 173, 1.0)),
+    // ];
+    // cardsList = futureCardsList;
+
+    cardsList = await DbStore.getUserCards();
+
+    return cardsList;
   }
 
   Widget _buildCard(CardItemModel cardItem) {
     return GestureDetector(
-      child: Padding(
+      child: new Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Card(
+        child: new Card(
           child: Container(
             width: 250.0,
             child: Column(
@@ -202,10 +209,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         cardItem.icon,
                         color: cardItem.color,
                       ),
-                      Icon(
-                        Icons.more_vert,
-                        color: Colors.grey,
-                      ),
+                      // new IconButton(
+                      //   icon: Icon(
+                      //     Icons.more_vert,
+                      //     color: Colors.grey,
+                      //   ),
+                      //   onPressed: () async {
+                      //     print('on pressed');
+                      //     await _onLongPressCard(cardItem);
+                      //   },
+                      // )
                     ],
                   ),
                 ),
@@ -244,6 +257,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               style: TextStyle(fontSize: 28.0)),
                           onTap: () async {
                             // TODO get new guid and push to db
+
                             var document = new MdDocument();
                             document.name = "New markdown document";
 
@@ -253,10 +267,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               builder: (context) =>
                                   MarkdownEditorWidget(document),
                             ));
+
                             if (documentAfterEdit != null) {
-                              setState(() {
-                                cardItem.documents.remove(document);
+                              setState(() async {
                                 cardItem.documents.add(documentAfterEdit);
+
+                                await DbStore.saveUserCards(cardsList);
                               });
                             }
                           },
@@ -272,16 +288,64 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
       ),
-      onHorizontalDragEnd: _horizontalDragCard,
-      onLongPressStart: (details) {
-        _onLongPressCard(cardItem, details);
+      //   onHorizontalDragEnd: _horizontalDragCard,
+      onLongPressStart: (details) async {
+        setState(() {
+          _onLongPressCard(cardItem, details);
+        });
+        await DbStore.saveUserCards(cardsList);
       },
-      onTap: () {
-        Navigator.pushNamed(context, '/cardDisplay',
-            arguments: new CardDisplayArgs(
-                cardItem.color, cardItem.cardTitle, cardItem.documents));
+      onTap: () async {
+        await Navigator.of(context).push(new MaterialPageRoute(
+          builder: (context) => CardDisplay(new CardDisplayArgs(
+              cardItem.color, cardItem.cardTitle, cardItem.documents)),
+        ));
       },
     );
+  }
+
+  Widget _newCardButton() {
+    return
+        //  GestureDetector(
+        //   child:
+        new Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: new Card(
+        child: Container(
+          width: 250.0,
+          child: new IconButton(
+            icon: const Icon(Icons.add, size: 80, color: Colors.grey),
+            onPressed: () async {
+              String newCardTitle = await _addNewCard();
+              print(newCardTitle);
+              setState(() {
+                cardsList.add(new CardItemModel(newCardTitle, Icons.ac_unit, 0,
+                    0.32, Color.fromRGBO(111, 194, 173, 1.0)));
+              });
+              await DbStore.saveUserCards(cardsList);
+            },
+          ),
+          // child: Column(
+          //   Padding(
+          //     padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
+          //   ),
+          // ),
+        ),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ),
+    );
+    //   onHorizontalDragEnd: _horizontalDragCard,
+    // onLongPressStart: (details) async {
+    //   await _onLongPressCard(cardItem, details);
+    // },
+    // onTap: () async {
+    //   await Navigator.of(context).push(new MaterialPageRoute(
+    //     builder: (context) => CardDisplay(new CardDisplayArgs(
+    //         cardItem.color, cardItem.cardTitle, cardItem.documents)),
+    //   ));
+    // },
+    // );
   }
 
   final popupButtonKey = GlobalKey<
@@ -298,7 +362,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     ),
   ];
 
-  _onLongPressCard(cardItem, LongPressStartDetails details) {
+  _onLongPressCard(cardItem, details) {
     List<String> choices = ["Delete", "Edit"];
     showMenu(
       position: RelativeRect.fromLTRB(details.globalPosition.dx,
@@ -373,14 +437,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  void _deleteCard(card) {
+  Future _deleteCard(card) {
     setState(() {
       cardsList.remove(card);
       if (cardIndex > cardsList.length) cardIndex--;
     });
   }
 
-  void _editCard(CardItemModel card) async {
+  Future _editCard(CardItemModel card) async {
     final myController = TextEditingController();
     myController.text = card.cardTitle;
     await showDialog<String>(
@@ -418,13 +482,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  void _onPressFloatingAddButton() {
-    _addNewCard();
-  }
-
-  _addNewCard() async {
+  Future<String> _addNewCard() async {
     final myController = TextEditingController();
-    await showDialog<String>(
+    return await showDialog<String>(
       context: context,
       builder: (context) => new AlertDialog(
             contentPadding: const EdgeInsets.all(16.0),
@@ -443,17 +503,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               new FlatButton(
                   child: const Text('CANCEL'),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop<String>(context, null);
                   }),
               new FlatButton(
                   child: const Text('ADD'),
                   onPressed: () {
-                    setState(() {
-                      if (myController.text.length > 0)
-                        cardsList.add(CardItemModel(myController.text,
-                            Icons.account_circle, 9, 0.83, appColors[0]));
-                    });
-                    Navigator.pop(context);
+                    Navigator.pop<String>(context, myController.text);
                   })
             ],
           ),
@@ -490,6 +545,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             cardItem.documents.remove(document);
             cardItem.documents.add(documentAfterEdit);
           });
+          await DbStore.saveUserCards(cardsList);
         }
       },
       contentPadding: EdgeInsets.only(bottom: 0.0),

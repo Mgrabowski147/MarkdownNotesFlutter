@@ -27,4 +27,18 @@ class DbStore {
 
     return cards;
   }
+
+  static Future saveUserCards(List<CardItemModel> cards) async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    var currentUser = await _auth.currentUser();
+
+    DocumentReference userCardsReference =
+        Firestore.instance.collection('cards').document(currentUser.uid);
+
+    var serializedCards = {
+      'cards': cards.map((c) => c.toStore()).toList(),
+    };
+
+    await userCardsReference.setData(serializedCards);
+  }
 }
