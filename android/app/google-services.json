@@ -1,0 +1,41 @@
+{
+    "project_info": {
+        "project_number": "324968110590",
+        "firebase_url": "https://markdown-notes-android-proj.firebaseio.com",
+        "project_id": "markdown-notes-android-proj",
+        "storage_bucket": "markdown-notes-android-proj.appspot.com"
+    },
+    "client": [{
+        "client_info": {
+            "mobilesdk_app_id": "1:324968110590:android:5ef90e6257cb44e8",
+            "android_client_info": {
+                "package_name": "com.example.markdown_notes_flutter"
+            }
+        },
+        "oauth_client": [{
+                "client_id": "324968110590-5rhfpre6ickmp3ekpsj6h89ilbnt856m.apps.googleusercontent.com",
+                "client_type": 1,
+                "android_info": {
+                    "package_name": "com.example.markdown_notes_flutter",
+                    "certificate_hash": "c4c4c40825ba73e4e784ac09d15663d69acb7c44"
+                }
+            },
+            {
+                "client_id": "324968110590-7ghh84ibq4vft14g4iu0s45upheahqgv.apps.googleusercontent.com",
+                "client_type": 3
+            }
+        ],
+        "api_key": [{
+            "current_key": "AIzaSyDAmP-MFJQoO6MoBqxP7sp3iqGQ-CY56ek"
+        }],
+        "services": {
+            "appinvite_service": {
+                "other_platform_oauth_client": [{
+                    "client_id": "324968110590-7ghh84ibq4vft14g4iu0s45upheahqgv.apps.googleusercontent.com",
+                    "client_type": 3
+                }]
+            }
+        }
+    }],
+    "configuration_version": "1"
+}
