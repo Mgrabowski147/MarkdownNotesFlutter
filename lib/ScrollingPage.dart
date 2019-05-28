@@ -66,7 +66,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
           elevation: 0.0,
         ),
-        drawer: Drawer(),
         body: new Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,21 +90,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         padding:
                             const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 12.0),
                         child: Text(
-                          "Hello, Kate.",
+                          "Hello.",
                           style: TextStyle(
                               fontSize: 30.0,
                               color: Colors.white,
                               fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                      Text(
-                        "Looks like feel good.",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "You have 3 tasks to do today.",
-                        style: TextStyle(
-                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -119,7 +108,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 64.0, vertical: 8.0),
                     child: Text(
-                      "TODAY : JUL 21, 2018",
+                      "Today : " + DateTime.now().toIso8601String().substring(0, 10),
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

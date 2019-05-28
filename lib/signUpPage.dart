@@ -147,7 +147,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
     on PlatformException
     {
-      _showError("Password should be stronger");
+      _showError("Password should be stronger", msg: "Password should contain at least 1 capital letter and 1 number");
       return;
     }
     Navigator.pop(context);
