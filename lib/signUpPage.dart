@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'ScrollingPage.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:markdown_notes_flutter/CardItemModel.dart';
 
 class SignUpPage extends StatefulWidget {
   SignUpPage({this.title});
@@ -173,6 +174,21 @@ class _SignUpPageState extends State<SignUpPage> {
       String email, String password) async {
     FirebaseUser user = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
+
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    var currentUser = await _auth.currentUser();
+
+    DocumentReference userCardsReference =
+    Firestore.instance.collection('cards').document(currentUser.uid);
+
+    List<CardItemModel> cards = new List<CardItemModel>();
+
+    var serializedCards = {
+      'cards': cards.map((c) => c.toStore()).toList(),
+    };
+
+    await userCardsReference.setData(serializedCards);
+
     return user.uid;
   }
 
