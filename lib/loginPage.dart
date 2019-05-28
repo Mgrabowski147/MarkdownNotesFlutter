@@ -19,6 +19,14 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
 
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildLayoutContainer(context),
+    );
+  }
+
   Widget _buildLayoutContainer(BuildContext context) {
     return SingleChildScrollView(
       child: _buildFormWrapper(context),
@@ -129,13 +137,14 @@ class _LoginPageState extends State<LoginPage> {
       }
       on PlatformException catch (error)
       {
-        print(error);
-        // TODO: display error message
+        _showError("Invalid username or password");
+        return;
       }
 
       if(currentUser == null) {
         _isLoading = false;
-        return; // TODO: print some error messsage
+        _showError("Invalid username or password");
+        return;
       }
       Navigator.of(context)
           .push<HomePage>(new MaterialPageRoute(
@@ -154,10 +163,31 @@ class _LoginPageState extends State<LoginPage> {
     ));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _buildLayoutContainer(context),
+  void _showError(String title, {String msg = ""})
+  {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(msg),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

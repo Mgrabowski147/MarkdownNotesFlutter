@@ -130,20 +130,29 @@ class _SignUpPageState extends State<SignUpPage> {
 
 
 
-  void _onPressedSignUpButton() {
+  void _onPressedSignUpButton() async {
     if(validateEmail(_emailController.text) != null)
     {
-      //TODO: handle incorrect email
+      _showError("Incorrect email");
       return;
     }
     if(!_passwordsEqual || _passwordConfirmController.text == null)
     {
-      //TODO: handle incorrect passwords
+      _showError("Passwords must be the same");
       return;
     }
-    createUserWithEmailAndPassword(_emailController.text, _passwordConfirmController.text);
+    try{
+      await createUserWithEmailAndPassword(_emailController.text, _passwordConfirmController.text);
+    }
+    on PlatformException
+    {
+      _showError("Password should be stronger");
+      return;
+    }
     Navigator.pop(context);
   }
+
+
 
   String validateEmail(String value) {
     String pattern =
@@ -165,5 +174,33 @@ class _SignUpPageState extends State<SignUpPage> {
     FirebaseUser user = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     return user.uid;
+  }
+
+  void _showError(String title, {String msg = ""})
+  {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(msg),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
