@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'ScrollingPage.dart';
 import 'package:flutter/services.dart';
+import 'signUpPage.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.title});
@@ -99,7 +100,9 @@ class _LoginPageState extends State<LoginPage> {
      child: Column(
        mainAxisSize: MainAxisSize.min,
        children: <Widget>[
-         Text(" "),
+         SizedBox(
+           height: 20,
+         ),
          Text("Don't have an account? "),
          FlatButton(
           textColor: Colors.blue,
@@ -144,7 +147,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onPressedSignUp() {
-
+    Navigator.of(context)
+        .push<SignUpPage>(new MaterialPageRoute(
+      builder: (context) =>
+          SignUpPage(),
+    ));
   }
 
   @override
