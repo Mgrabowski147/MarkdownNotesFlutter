@@ -9,11 +9,20 @@ import 'editor-widget/mdDocument.dart';
 import 'cardDisplayArgs.dart';
 
 class HomePage extends StatefulWidget {
+  final userId;
+
   @override
-  _HomePageState createState() => new _HomePageState();
+  _HomePageState createState() => new _HomePageState(userId);
+
+  HomePage(this.userId);
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+
+  final _userId;
+
+  _HomePageState(this._userId);
+
   var appColors = [
     Color.fromRGBO(231, 129, 109, 1.0),
     Color.fromRGBO(99, 138, 223, 1.0),
