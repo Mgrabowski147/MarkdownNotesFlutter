@@ -7,8 +7,7 @@ class DbStore {
   static Future<List<CardItemModel>> getUserCards() async {
     FirebaseAuth _auth = FirebaseAuth.instance;
 
-    var currentUser = await _auth.signInWithEmailAndPassword(
-        email: 'mail@gmail.com', password: 'test123');
+    var currentUser = await _auth.currentUser();
 
     print('uid');
     print(currentUser.uid);

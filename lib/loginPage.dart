@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'ScrollingPage.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({this.title});
@@ -15,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
 
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   Widget _buildLayoutContainer(BuildContext context) {
     return SingleChildScrollView(
@@ -42,7 +44,8 @@ class _LoginPageState extends State<LoginPage> {
           SizedBox(
             height: 20,
           ),
-          _buildSubmitButton(context)
+          _buildSubmitButton(context),
+          _buildSignUpText(context),
         ],
       ),
     );
@@ -91,19 +94,56 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _buildSignUpText(BuildContext context) {
+    return Center(
+     child: Column(
+       mainAxisSize: MainAxisSize.min,
+       children: <Widget>[
+         Text(" "),
+         Text("Don't have an account? "),
+         FlatButton(
+          textColor: Colors.blue,
+          onPressed: _onPressedSignUp,
+          child: Text("Sign up"),
+          shape: CircleBorder(side: BorderSide(color: Colors.transparent))
+       )
+      ]
+     )
+    );
+  }
+
   void _onPressedLoginButton() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    var a = _emailController.text;
-    var currentUser = await _auth.signInWithEmailAndPassword(
-      //email: 'mail@gmail.com', password: 'test123');
-        email: _emailController.text, password: _passwordController.text);
-    if(currentUser == null)
-      return; // TODO: print some error messsage
-    Navigator.of(context)
-        .push<HomePage>(new MaterialPageRoute(
-      builder: (context) =>
-          HomePage(currentUser.uid),
-    ));
+    if(!_isLoading) {
+      _isLoading = true;
+
+      FirebaseAuth _auth = FirebaseAuth.instance;
+      var a = _emailController.text;
+      var currentUser;
+      try {
+        currentUser = await _auth.signInWithEmailAndPassword(
+          //email: 'mail@gmail.com', password: 'test123');
+            email: _emailController.text, password: _passwordController.text);
+      }
+      on PlatformException catch (error)
+      {
+        print(error);
+        // TODO: display error message
+      }
+
+      if(currentUser == null) {
+        _isLoading = false;
+        return; // TODO: print some error messsage
+      }
+      Navigator.of(context)
+          .push<HomePage>(new MaterialPageRoute(
+        builder: (context) =>
+            HomePage(),
+      ));
+      _isLoading = false;
+    }
+  }
+
+  void _onPressedSignUp() {
 
   }
 
