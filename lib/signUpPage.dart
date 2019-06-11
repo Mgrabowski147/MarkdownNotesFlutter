@@ -42,7 +42,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildLoginLayout(BuildContext context) {
     return Container(
-      color: Color.fromRGBO(231, 129, 109, 1.0),
       padding: EdgeInsets.only(top: 100, left: 20, right: 20),
       child: Column(
         children: <Widget>[
@@ -122,6 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return ButtonTheme(
       minWidth: double.infinity,
       child: RaisedButton(
+        color: Colors.deepOrange,
         child: Text(
           "Sign up",
           style: TextStyle(color: Colors.white),

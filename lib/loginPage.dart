@@ -95,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
     return ButtonTheme(
       minWidth: double.infinity,
       child: RaisedButton(
+        color: Colors.deepOrange,
         child: Text(
           "Login",
           style: TextStyle(color: Colors.white),
