@@ -23,6 +23,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(231, 129, 109, 1.0),
       body: _buildLayoutContainer(context),
     );
   }
@@ -41,6 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildLoginLayout(BuildContext context) {
     return Container(
+      color: Color.fromRGBO(231, 129, 109, 1.0),
       padding: EdgeInsets.only(top: 100, left: 20, right: 20),
       child: Column(
         children: <Widget>[
