@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'ScrollingPage.dart';
 import 'cardDisplay.dart';
+import 'package:markdown_notes_flutter/loginPage.dart';
 
 void main() => runApp(new MyApp());
 
@@ -13,10 +14,10 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new HomePage(),
+      home: new LoginPage(),
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder> {
-        '/homescreen': (BuildContext context) => new HomePage(),
+        '/loginscreen': (BuildContext context) => new LoginPage(),
       },
       onGenerateRoute: _getRoute,
     );

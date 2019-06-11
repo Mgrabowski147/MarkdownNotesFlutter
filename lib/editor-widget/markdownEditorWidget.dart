@@ -7,8 +7,9 @@ import 'mdDocument.dart';
 class MarkdownEditorWidget extends StatefulWidget {
   final MdDocument mdDocument;
   MdDocument editMdDocument;
+  final Color bgColor;
 
-  MarkdownEditorWidget(this.mdDocument) {
+  MarkdownEditorWidget(this.mdDocument, this.bgColor) {
     this.editMdDocument = new MdDocument();
     this.editMdDocument.content = this.mdDocument.content;
     this.editMdDocument.name = this.mdDocument.name;
@@ -16,12 +17,15 @@ class MarkdownEditorWidget extends StatefulWidget {
   }
 
   @override
-  MarkdownEditorState createState() => new MarkdownEditorState();
+  MarkdownEditorState createState() => new MarkdownEditorState(bgColor);
 }
 
 class MarkdownEditorState extends State<MarkdownEditorWidget> {
   TextEditingController _documentNameController = TextEditingController();
   TextEditingController _documentContentController = TextEditingController();
+  final Color bgColor;
+
+  MarkdownEditorState(this.bgColor);
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +34,7 @@ class MarkdownEditorState extends State<MarkdownEditorWidget> {
 
     return new Scaffold(
       appBar: new AppBar(
+        backgroundColor: bgColor,
         title: const Text('Editor'),
         actions: <Widget>[
           new IconButton(icon: const Icon(Icons.pageview), onPressed: _lookup),
@@ -81,7 +86,7 @@ class MarkdownEditorState extends State<MarkdownEditorWidget> {
     // await new DbStore().updateUserData();
 
     await Navigator.of(context).push(new MaterialPageRoute(
-      builder: (context) => MarkdownLookupWidget(lookupDoc),
+      builder: (context) => MarkdownLookupWidget(lookupDoc, bgColor),
     ));
   }
 

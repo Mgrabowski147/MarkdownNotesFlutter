@@ -9,11 +9,14 @@ import 'editor-widget/mdDocument.dart';
 import 'cardDisplayArgs.dart';
 
 class HomePage extends StatefulWidget {
+
   @override
   _HomePageState createState() => new _HomePageState();
+
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+
   var appColors = [
     Color.fromRGBO(231, 129, 109, 1.0),
     Color.fromRGBO(99, 138, 223, 1.0),
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   AnimationController animationController;
   ColorTween colorTween;
   CurvedAnimation curvedAnimation;
+  String name;
 
   @override
   void initState() {
@@ -49,10 +53,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         backgroundColor: currentColor,
         resizeToAvoidBottomPadding: false,
         appBar: new AppBar(
-          title: new Text(
-            "Markdown Notes",
-            style: TextStyle(fontSize: 16.0),
-          ),
+          title: new FutureBuilder(
+            future: getName(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                return new Text("Hello, " + name);
+                }),
           backgroundColor: currentColor,
           centerTitle: true,
           actions: <Widget>[
@@ -63,52 +68,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
           elevation: 0.0,
         ),
-        drawer: Drawer(),
         body: new Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Row(),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 64.0, vertical: 24.0),
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Icon(
-                          Icons.account_circle,
-                          size: 45.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 12.0),
-                        child: Text(
-                          "Hello, Kate.",
-                          style: TextStyle(
-                              fontSize: 30.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                      Text(
-                        "Looks like feel good.",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "You have 3 tasks to do today.",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -116,12 +80,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 64.0, vertical: 8.0),
                     child: Text(
-                      "TODAY : JUL 21, 2018",
+                      "Today : " + DateTime.now().toIso8601String().substring(0, 10),
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                   Container(
-                    height: 280.0,
+                    height: 420.0,
                     child: new FutureBuilder(
                       future: _getData(),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -229,7 +193,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     children: <Widget>[
                       ...cardItem.documents
                           // TODO: .sort((doc) => doc.editDate)
-                          .take(2)
+                          .take(4)
                           .map(
                             (doc) => Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -265,7 +229,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 await Navigator.of(context)
                                     .push<MdDocument>(new MaterialPageRoute(
                               builder: (context) =>
-                                  MarkdownEditorWidget(document),
+                                  MarkdownEditorWidget(document, cardItem.color),
                             ));
 
                             if (documentAfterEdit != null) {
@@ -530,7 +494,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       onTap: () async {
         await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
-          builder: (context) => MarkdownLookupWidget(document),
+          builder: (context) => MarkdownLookupWidget(document, cardItem.color),
         ));
       },
       onLongPress: () async {
@@ -538,7 +502,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
         final documentAfterEdit =
             await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
-          builder: (context) => MarkdownEditorWidget(document),
+          builder: (context) => MarkdownEditorWidget(document, cardItem.color),
         ));
         if (documentAfterEdit != null) {
           setState(() {
@@ -573,5 +537,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       isLoggingIn = false;
       mUserName = mUser.displayName;
     });
+  }
+
+  Future<String> getName() async
+  {
+    name = await DbStore.getUserName();
+    name = name.split('@')[0];
+    return name;
   }
 }
