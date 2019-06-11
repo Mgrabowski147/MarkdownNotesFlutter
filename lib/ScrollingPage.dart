@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     children: <Widget>[
                       ...cardItem.documents
                           // TODO: .sort((doc) => doc.editDate)
-                          .take(2)
+                          .take(4)
                           .map(
                             (doc) => Padding(
                                 padding: const EdgeInsets.symmetric(
