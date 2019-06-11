@@ -54,7 +54,7 @@ class _CardDisplayState extends State<CardDisplay> {
 
               final documentAfterEdit = await Navigator.of(context)
                   .push<MdDocument>(new MaterialPageRoute(
-                builder: (context) => MarkdownEditorWidget(document),
+                builder: (context) => MarkdownEditorWidget(document, currentColor),
               ));
 
               if (documentAfterEdit != null) {
@@ -113,7 +113,7 @@ class _CardDisplayState extends State<CardDisplay> {
       ),
       onTap: () async {
         await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
-          builder: (context) => MarkdownLookupWidget(document),
+          builder: (context) => MarkdownLookupWidget(document, currentColor),
         ));
       },
       onLongPress: () async {
@@ -121,7 +121,7 @@ class _CardDisplayState extends State<CardDisplay> {
 
         final documentAfterEdit =
             await Navigator.of(context).push<MdDocument>(new MaterialPageRoute(
-          builder: (context) => MarkdownEditorWidget(document),
+          builder: (context) => MarkdownEditorWidget(document, currentColor),
         ));
         if (documentAfterEdit != null) {
           setState(() {
@@ -140,7 +140,7 @@ class _CardDisplayState extends State<CardDisplay> {
     var lookupDoc = new MdDocument();
     lookupDoc.content = document.content == null ? "" : document.content;
     Navigator.of(context).push(new MaterialPageRoute(
-      builder: (context) => MarkdownLookupWidget(lookupDoc),
+      builder: (context) => MarkdownLookupWidget(lookupDoc, currentColor),
     ));
   }
 }

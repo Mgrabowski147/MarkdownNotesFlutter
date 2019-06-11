@@ -5,16 +5,17 @@ import 'mdDocument.dart';
 
 class MarkdownLookupWidget extends StatefulWidget {
   final MdDocument mdDocument;
-
-  MarkdownLookupWidget(this.mdDocument);
+  final Color bgColor;
+  MarkdownLookupWidget(this.mdDocument, this.bgColor);
 
   @override
-  MarkdownLookupState createState() => new MarkdownLookupState();
+  MarkdownLookupState createState() => new MarkdownLookupState(bgColor);
 }
 
 class MarkdownLookupState extends State<MarkdownLookupWidget> {
-  // TextEditingController _documentNameController = TextEditingController();
-  // TextEditingController _documentContentController = TextEditingController();
+
+  MarkdownLookupState(this.bgColor);
+  Color bgColor;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +23,7 @@ class MarkdownLookupState extends State<MarkdownLookupWidget> {
     // _documentContentController.text = widget.mdDocument.content;
     return new Scaffold(
       appBar: new AppBar(
+        backgroundColor: bgColor,
         title: const Text('Editor'),
         // actions: <Widget>[
         //   new IconButton(

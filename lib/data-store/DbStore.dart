@@ -42,4 +42,10 @@ class DbStore {
 
     await userCardsReference.setData(serializedCards);
   }
+
+  static Future<String> getUserName() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    var currentUser = await _auth.currentUser();
+    return currentUser.email;
+  }
 }
