@@ -34,6 +34,7 @@ class MarkdownEditorState extends State<MarkdownEditorWidget> {
 
     return new Scaffold(
       appBar: new AppBar(
+        backgroundColor: bgColor,
         title: const Text('Editor'),
         actions: <Widget>[
           new IconButton(icon: const Icon(Icons.pageview), onPressed: _lookup),
